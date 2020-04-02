@@ -27,6 +27,7 @@ dependencies {
 asciidoctor {
     configurations 'asciidoctorExt'
     sourceDir = file("src/asciidoc/")
+    outputDir = file("${buildDir}")
     baseDirFollowsSourceFile()
     sources {
         include 'index.adoc'
