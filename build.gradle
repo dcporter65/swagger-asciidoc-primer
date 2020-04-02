@@ -1,0 +1,43 @@
+plugins {
+    id 'org.asciidoctor.jvm.convert' version '3.1.0'
+}
+
+repositories {
+    maven {
+        url "https://repo.spring.io/release"
+    }
+    mavenCentral()
+}
+
+configurations {
+    asciidoctorExt
+}
+
+asciidoctorj {
+    modules {
+        diagram.use()
+        diagram.version '1.5.16'
+    }
+}
+
+dependencies {
+    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.1.RELEASE'
+}
+
+asciidoctor {
+    configurations 'asciidoctorExt'
+    sourceDir = file("src/asciidoc/")
+    baseDirFollowsSourceFile()
+    sources {
+        include 'index.adoc'
+    }
+    attributes = [
+            'doctype'           : 'book',
+            'toc'               : 'left',
+            'toclevels'         : '3',
+            'source-highlighter': 'prettify',
+            'revnumber'         : '',
+            'docinfo'           : 'shared',
+            'sectanchors'       : 'true'
+    ]
+}
