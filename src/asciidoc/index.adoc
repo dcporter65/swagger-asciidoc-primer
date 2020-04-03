@@ -1,7 +1,7 @@
 = Documenting APIs with Swagger and AsciiDoc
 :version-label!:
 
-The document explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
+This guide explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
 documentation for your RESTful APIs.
 
 == Process overview
@@ -27,7 +27,7 @@ participant "HTML/PDF" as Html
 Developer -> API: Add Swagger annotations
 alt Buiid time
     API -> Swag: Swagger plugin
-else Run time
+else runtime
     API -> Swag: Springfox
 end
 Swag -> Adoc: Swagger2markup
@@ -45,7 +45,7 @@ https://swagger.io/specification/v2/[Swagger Specification] which is used to des
 The Swagger spec became the https://swagger.io/specification/[OpenApi Specification] in version 3.0. The examples shown
 here use Swagger 2.0, since the tools we are using to generate the documentation have not yet caught up with the 3.0 standard.
 
-You can choose to generate a Swagger specification from your API at either build time or run time.
+You can choose to generate a Swagger specification from your API at either build time or runtime.
 
 === Design first or code first?
 
@@ -57,7 +57,7 @@ specification is the single source of truth for the API.
 
 Code-first means that developers write the APIs using an appropriate RESTful coding framework, such as JAX-RS or Spring
 MVC, and add Swagger annotations to the code during the development process. A Swagger specification is then generated
-from the code either at build time or at run time. In this case, the code is the single source of truth.
+from the code either at build time or at runtime. In this case, the code is the single source of truth.
 
 This document deals with the code-first approach.
 
@@ -106,12 +106,15 @@ Here are some of the most useful Swagger annotations:
 [cols=",,",options="header",]
 |===
 |Annotation |Description |Attributes
+
 |`@Api` |Marks the class as a Swagger resource.  a|
+
 `tags` – Groups all the APIs in this class under a particular heading in the documentation
 
 `description` – Adds a further description for this group of APIs
 
 |`@ApiOperation` |Used to document an individual API, usually a unique combination of HTTP method and resource path a|
+
 `value` – The name of the API. Appears as a section title in the generated documentation. For example "Get widget". Does
 not end with a full stop (period).
 
@@ -128,6 +131,7 @@ this annotation to set the name of the response class. 
 set this for APIs that return 201, 202, and 204. Alternatively, you can set this in the @ApiResponse annotation.
 
 |@ApiParam |Used to document parameters that can be sent when the API is called. a|
+
 `value` – A description of the parameter that appears in the generated documentation.
 
 `required` – A boolean showing whether the parameter is required. Defaults to false.
@@ -135,8 +139,11 @@ set this for APIs that return 201, 202, and 204. Alternatively, you can set this
 `allowableValues` – A comma-separated list of allowable values.
 
 |`@ApiResponses` |Use this annotation where the response to a successful API call cannot be inferred from the code.
+
 |None. Contains a list of `@ApiResponse` annotations.
+
 |`@ApiResponse` |Defines an API response a|
+
 `code` – The HTTP response code that is returned when this API is called successfully.
 
 `message` – The message that accompanies the HTTP response, for example 'No content'.
@@ -208,11 +215,15 @@ under the docs module's `build` directory.
 
 === Generating Swagger at Runtime
 
-You can also generate a `swagger.json` file at run time by executing a test against a running API server using one of the
-following:
+There are a number of libraries that allow you to generate a Swagger or OpenAPI specification, as well as a https://swagger.io/tools/swagger-ui/[Swagger UI]
+API console at runtime. Here are a few that are used in the Java space:
 
-* http://springfox.github.io/springfox/[Springfox]
-* https://github.com/swagger-api/swagger-core/wiki/Swagger-Core-Jersey-2.X-Project-Setup-1.5[Swagger Core with Jersey 2.0]
+* https://github.com/swagger-api/swagger-core[Swagger Core]
+* http://springfox.github.io/springfox/[Springfox] - for projects that rely on the Spring Framework
+* https://springdoc.org/[springdoc-openapi] - for projects that use Spring Boot
+
+All these libraries expose a `swagger.json` or `openapi.json` at an HTTP URL when the API server is running.
+You can create a test that writes the JSON to a file in your project, so that you proceed to the next step.
 
 == Converting Swagger to AsciiDoc
 
@@ -228,8 +239,7 @@ https://asciidoctor.org/[Asciidoctor] tool chain to produce HTML and PDF from As
 === Swagger2markup
 
 The Swagger to AsciiDoc conversion is handled by the
-https://github.com/Swagger2Markup/swagger2markup-gradle-plugin[Swagger2markup Gradle plugin], which is declared in the 
-`build.gradle` of the project `docs` module.
+https://github.com/Swagger2Markup/swagger2markup-gradle-plugin[Swagger2markup Gradle plugin].
 
 NOTE: See the https://github.com/Swagger2Markup/swagger2markup-maven-plugin[Swagger2markup Maven plugin] if you are using
 Maven.
@@ -291,6 +301,30 @@ You add the samples as follows:
 . In the new directory, create an AsciiDoc file called `operation-end-sample`.
 . Call the API either by running an acceptance test or using cURL or Postman.
 . Copy the output into the `operation-end-sample` file.
+
+.Sample request and response
+....
+[[getWidget.sample]]
+== Sample request and response markup
+
+[source,role="primary"]
+.Request
+----
+GET https://api.example.com/api/widgets/6cef9e60-8d30-40d5-bbab-c22e6eca9927/users/f6486748-4f6b-4274-9cd4-769ef0671e24
+Accept: application/json
+----
+[source,role="secondary"]
+.Response
+----
+200
+Content-Type: application/json
+Date: Mon, 10 Feb 2020 14:34:50 GMT
+{
+"uid": "f6486748-4f6b-4274-9cd4-769ef0671e24",
+"foo": "bar"
+}
+----
+....
 
 == Generating HTML and PDF
 
@@ -373,12 +407,15 @@ You generate the HTML and PDF by running the `asciidoctor` Gradle task. 
 The Asciidoctor plugin depends on two other libraries:
 
 * https://github.com/asciidoctor/asciidoctorj-pdf[AsciidoctorJPDF] is used for PDF generation
-* https://github.com/spring-io/spring-asciidoctor-extensions[Spring Asciidoctor Extensions] post-processes Asciidoctor’s HTML output to collapse multiple code blocks into one that provides side-by-side code samples. The extensions are stored in the https://repo.spring.io/release[repo.spring.io] Artifactory repository, which is included in the repositories section of the build.gradle.
+* https://github.com/spring-io/spring-asciidoctor-extensions[Spring Asciidoctor Extensions] post-processes Asciidoctor’s
+  HTML output to collapse multiple code blocks into one that provides side-by-side code samples. 
+  The extensions are stored in the https://repo.spring.io/release[repo.spring.io] Artifactory repository, which is
+  included in the `repositories` section of the build.gradle.
 
-=== Including side by side code samples
+=== Including side-by-side code snippets
 
-Instead of displaying each sample request and response one below the other, as is the default, it can look good to render
-them in a side-by-side tabbed view in the generated HTML.
+Instead of displaying code samples one below the other, as is the default, it can look good to render them in a
+side-by-side tabbed view in the generated HTML.
 
 For this you can use the block switch extension in the https://github.com/spring-io/spring-asciidoctor-extensions[Spring Asciidoctor Extensions] library.
 
@@ -405,14 +442,12 @@ So this markup ...
 ====
 
 [source,groovy,role="primary"]
-
 .Gradle
 ----
 implementation 'com.acme.widget.client:2.1.1'
 ----
 
 [source,xml,role="secondary"]
-
 .Maven
 ----
 <dependency>
@@ -430,15 +465,12 @@ implementation 'com.acme.widget.client:2.1.1'
 ====
 
 [source,groovy,role="primary"]
-
 .Gradle
-
 ----
 implementation 'com.acme.widget.client:2.1.1'
 ----
 
 [source,xml,role="secondary"]
-
 .Maven
 ----
 <dependency>
@@ -452,6 +484,41 @@ implementation 'com.acme.widget.client:2.1.1'
 === Styling and themes
 
 You use a https://asciidoctor.org/docs/user-manual/#docinfo-file[docinfo] file to override Asciidoctor's default CSS styling for HTML output.
+
+The file should be named `docinfo.html` and be stored alongside your AsciiDoc source document.
+
+.Example docinfo.html
+----
+<style>
+
+    body, .tableblock > caption.title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .paragraph > .title {
+        font-family: "Open Sans", sans-serif
+    }
+
+    a:hover, a:active, a:focus {
+        text-decoration:none;
+         color:#009fe3;
+    }
+
+    .listingblock .switch {
+        border-color: #0061a0;
+    }
+
+    .switch .switch--item {
+        color: #0061a0;
+    }
+
+    .switch .switch--item.selected {
+        background-color: #0061a0;
+        color: #ffffff;
+    }
+
+    .switch .switch--item:not(:first-child) {
+        border-color: #0061a0;
+    }
+
+</style>
+----
 
 For PDF output you use the https://github.com/asciidoctor/asciidoctor-pdf/blob/master/docs/theming-guide.adoc[theming] system.
 These two lines in the Asciidoctor configuration in the `build.gradle` govern the themes used:
