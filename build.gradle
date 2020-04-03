@@ -1,5 +1,6 @@
 plugins {
     id 'org.asciidoctor.jvm.convert' version '3.1.0'
+    id 'org.asciidoctor.jvm.pdf' version '3.1.0'
 }
 
 repositories {
@@ -28,17 +29,22 @@ asciidoctor {
     configurations 'asciidoctorExt'
     sourceDir = file("src/asciidoc/")
     outputDir = file("${buildDir}")
+    outputOptions{
+        backends = ['html5', 'pdf']
+        separateOutputDirs = false
+    }
     baseDirFollowsSourceFile()
     sources {
         include 'index.adoc'
     }
     attributes = [
-            'doctype'           : 'book',
-            'toc'               : 'left',
-            'toclevels'         : '3',
-            'source-highlighter': 'prettify',
+            'imagesdir'         : './images',
             'revnumber'         : '',
             'docinfo'           : 'shared',
-            'sectanchors'       : 'true'
+            'doctype'           : 'book',
+            'sectanchors'       : 'true',
+            'source-highlighter': 'prettify',
+            'toc'               : 'left',
+            'toclevels'         : '3'
     ]
 }

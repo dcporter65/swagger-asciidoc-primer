@@ -6,8 +6,9 @@ documentation for your RESTful APIs.
 
 == Process overview
 
-[plantuml, ./diagram, png]
 .Generating documentation
+ifndef::env-github[]
+[plantuml, ./diagram, png]
 ....
 @startuml
 
@@ -35,6 +36,11 @@ Adoc -> Html: Asciidoctor
 
 @enduml
 ....
+endif::[]
+
+ifdef::env-github[]
+image::process.png[]
+endif::[]
 
 == Generating a Swagger spec
 
@@ -438,9 +444,7 @@ There must be one 'primary' role and at least one 'secondary' role.
 So this markup ...
 
 ....
-.Adding dependencies
 ====
-
 [source,groovy,role="primary"]
 .Gradle
 ----
@@ -461,9 +465,8 @@ implementation 'com.acme.widget.client:2.1.1'
 
 &#8230; is rendered like this:
 
-.Adding dependencies
+ifndef::backend-pdf,env-github[]
 ====
-
 [source,groovy,role="primary"]
 .Gradle
 ----
@@ -480,6 +483,11 @@ implementation 'com.acme.widget.client:2.1.1'
 </dependency>
 ----
 ====
+endif::[]
+
+ifdef::backend-pdf,env-github[]
+image::code_tabs.png[]
+endif::[]
 
 === Styling and themes
 
@@ -488,35 +496,26 @@ You use a https://asciidoctor.org/docs/user-manual/#docinfo-file[docinfo] file t
 The file should be named `docinfo.html` and be stored alongside your AsciiDoc source document.
 
 .Example docinfo.html
+[source,html]
 ----
 <style>
-
-    body, .tableblock > caption.title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .paragraph > .title {
-        font-family: "Open Sans", sans-serif
-    }
-
     a:hover, a:active, a:focus {
         text-decoration:none;
-         color:#009fe3;
+        color:#009fe3;
     }
-
     .listingblock .switch {
         border-color: #0061a0;
     }
-
     .switch .switch--item {
         color: #0061a0;
     }
-
     .switch .switch--item.selected {
         background-color: #0061a0;
         color: #ffffff;
     }
-
     .switch .switch--item:not(:first-child) {
         border-color: #0061a0;
     }
-
 </style>
 ----
 
