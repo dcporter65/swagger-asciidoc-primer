@@ -9,8 +9,6 @@ To view the generated documentation, clone this repository and run the following
 ./gradlew asciidoctor
 ```
 
-The document is accessible at: 
+Generated HTML and PDF is available in the project `build` directory.
 
-```
-./build/index.html
-```
+Alternatively, you can view the document, as rendered by GitHub, from the [project source](./src/asciidoc/index.adoc).
