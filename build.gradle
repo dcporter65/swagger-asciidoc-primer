@@ -38,7 +38,6 @@ asciidoctor {
         include 'index.adoc'
     }
     attributes = [
-            'imagesdir'         : './images',
             'revnumber'         : '',
             'docinfo'           : 'shared',
             'doctype'           : 'book',

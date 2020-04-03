@@ -1,5 +1,6 @@
 = Documenting APIs with Swagger and AsciiDoc
 :version-label!:
+:imagesdir: ./images
 
 This guide explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
 documentation for your RESTful APIs.
