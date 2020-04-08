@@ -27,7 +27,7 @@ participant "AsciiDoc" as Adoc
 participant "HTML/PDF" as Html
 
 Developer -> API: Add Swagger annotations
-alt Buiid time
+alt Build time
     API -> Swag: Swagger plugin
 else runtime
     API -> Swag: Springfox
@@ -93,7 +93,7 @@ MVC. For example:
 [source,java]
 ----
 @Controller
-@RequestMapping(value = "/pets", produces = "applicationjson")
+@RequestMapping(value = "/pets", produces = "application/json")
 @Api(value = "/pets", tags = "Pets", description = "Operations about pets")
 public class PetController {
 
@@ -240,12 +240,12 @@ Once you have generated the Swagger specification you can use the Swagger2mark
 
 http://asciidoc.org/[AsciiDoc] is an easy-to-use, lightweight markup language that is well supported by a wide range of
 open source tools. It is similar to Markdown but is sophisticated enough to support many of the book-authoring features
-provided by more complicated specifications such as DocBook and DITA. We use parts of the
-https://asciidoctor.org/[Asciidoctor] tool chain to produce HTML and PDF from AsciiDoc source files.
+provided by more complicated specifications such as DocBook and DITA. https://asciidoctor.org/[Asciidoctor] is a toolchain
+used for processing AsciiDoc and converting it to various formats including HTML and PDF.
 
 === Swagger2markup
 
-The Swagger to AsciiDoc conversion is handled by the
+The Swagger-to-AsciiDoc conversion is handled by the
 https://github.com/Swagger2Markup/swagger2markup-gradle-plugin[Swagger2markup Gradle plugin].
 
 NOTE: See the https://github.com/Swagger2Markup/swagger2markup-maven-plugin[Swagger2markup Maven plugin] if you are using
@@ -336,12 +336,12 @@ Date: Mon, 10 Feb 2020 14:34:50 GMT
 == Generating HTML and PDF
 
 Once you have an AsciiDoc version of your API reference, you can combine it with other manually-maintained AsciiDoc
-documentation, such as an introductory chapter or 'error codes' section, and generate the final output as HTML or PDF.
+documentation, such as an introductory chapter, and generate the final output as HTML or PDF.
 
 To do this, you use the https://github.com/asciidoctor/asciidoctor-gradle-plugin[Asciidoctor Gradle plugin]. Once again,
-you declare the dependency in the docs module's build.gradle:
+you declare the dependency in the docs module's `build.gradle`:
 
-.Configuring the AsciiDoctor Gradle plugin
+.Configuring the Asciidoctor Gradle plugin
 [source, groovy]
 ----
 plugins {
@@ -526,7 +526,7 @@ These two lines in the Asciidoctor configuration in the `build.gradle` govern t
 .Theming configuration
 ----
 'pdf-stylesdir' : 'theme',
-'pdf-style' : 'my_theme',
+'pdf-style' : 'my_theme'
 ----
 
 === Including an expandable TOC
