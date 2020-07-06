@@ -50,7 +50,7 @@ design, build, document, and consume RESTful Web services. At its heart is the
 https://swagger.io/specification/v2/[Swagger Specification] which is used to describe a RESTful API in JSON or YAML format. 
 
 The Swagger spec became the https://swagger.io/specification/[OpenApi Specification] in version 3.0. The examples shown
-here use Swagger 2.0, since the tools we are using to generate the documentation have not yet caught up with the 3.0 standard.
+here use Swagger 2.0, since the swagger2markup tool used to generate the documentation has not yet caught up with the 3.0 standard.
 
 You can choose to generate a Swagger specification from your API at either build time or runtime.
 
@@ -129,7 +129,7 @@ not end with a full stop (period).
 widget specified by the widgetUid parameter." 
 
 `nickname` – Often required where the API method name is not unique across the project. For example, some projects use
-the method names get, create, and update in every resource class. For example, "getWidget"
+the method names `get`, `create`, and `update` in every resource class. For example, "getWidget"
 
 `response` – Where the response object cannot be inferred from the response statement in the code, you may need to use
 this annotation to set the name of the response class. 
@@ -230,7 +230,7 @@ API console at runtime. Here are a few that are used in the Java space:
 * https://springdoc.org/[springdoc-openapi] - for projects that use Spring Boot
 
 All these libraries expose a `swagger.json` or `openapi.json` at an HTTP URL when the API server is running.
-You can create a test that writes the JSON to a file in your project, so that you proceed to the next step.
+You can create a test that writes the JSON to a file in your project, so that you can proceed to the next step.
 
 == Converting Swagger to AsciiDoc
 
@@ -456,8 +456,8 @@ implementation 'com.acme.widget.client:2.1.1'
 .Maven
 ----
 <dependency>
-  <groupId>com.acme.widget.client</groupId>
-  <artifactId>entertainment-client</artifactId>
+  <groupId>com.acme.widget</groupId>
+  <artifactId>client</artifactId>
   <version>2.1.1</version>
 </dependency>
 ----
