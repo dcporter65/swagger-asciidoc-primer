@@ -1,0 +1,121 @@
+== Converting Swagger to AsciiDoc
+
+Once you have generated the Swagger specification you can use the Swagger2markup library to convert it to AsciiDoc.
+
+=== About AsciiDoc
+
+http://asciidoc.org/[AsciiDoc] is an easy-to-use, lightweight markup language that is well supported by a wide range of
+open source tools. It is similar to Markdown but is sophisticated enough to support many of the book-authoring features
+provided by more complicated specifications such as DocBook and DITA. https://asciidoctor.org/[Asciidoctor] is a toolchain
+used for processing AsciiDoc and converting it to various formats including HTML and PDF.
+
+=== Swagger2markup
+
+The Swagger-to-AsciiDoc conversion is handled by the
+https://github.com/Swagger2Markup/swagger2markup-gradle-plugin[Swagger2markup Gradle plugin].
+
+NOTE: See the https://github.com/Swagger2Markup/swagger2markup-maven-plugin[Swagger2markup Maven plugin] if you are using
+Maven.
+
+.Configuring the Swagger2markup Gradle plugin
+====
+[source,groovy,role="primary"]
+.build.gradle
+----
+buildscript {
+
+    dependencies {
+        classpath "io.github.swagger2markup:swagger2markup-gradle-plugin:1.3.3"
+        classpath "io.github.swagger2markup:swagger2markup-import-files-ext:1.3.3"
+    }
+}
+
+apply plugin: 'io.github.swagger2markup'
+
+convertSwagger2markup {
+    dependsOn(':mm-api-server:generateSwaggerDocumentation')
+    swaggerInput "${project.buildDir}/swagger/swagger.json"
+    outputDir file("${buildDir}/asciidoc/generated")
+    config = [
+        'swagger2markup.pathsGroupedBy': 'TAGS',
+        'swagger2markup.extensions.dynamicPaths.contentPath': file('src/asciidoc/extensions/paths').absolutePath
+    ]
+}
+----
+[source,kotlin,role="secondary"]
+.build.gradle.kts
+----
+import io.github.swagger2markup.tasks.Swagger2MarkupTask
+
+buildscript {
+    dependencies {
+        classpath("io.github.swagger2markup:swagger2markup-gradle-plugin:1.3.3")
+        classpath("io.github.swagger2markup:swagger2markup-import-files-ext:1.3.3")
+    }
+}
+
+apply(plugin = "io.github.swagger2markup")
+
+tasks.withType<Swagger2MarkupTask> {
+        swaggerInputFile = file("${project.buildDir}/swagger/swagger.json")
+        outputDir = file("${buildDir}/asciidoc/generated")
+        config = mapOf(
+                "swagger2markup.pathsGroupedBy" to "TAGS",
+                "swagger2markup.extensions.dynamicPaths.contentPath" to file("asciidoc/extensions/paths").absolutePath
+        )
+}
+----
+====
+
+The dependency on `swagger2markup-import-files-ext` and the `swagger2markup.extensions.dynamicPaths.contentPath`
+configuration relate to how sample requests and responses are included in the generated documentation.
+
+To convert the Swagger to AsciiDoc, run:
+
+`./gradlew convertSwagger2markup`
+
+=== Including sample requests and responses
+
+It is good practice to include a sample request and response in the documentation for each your your APIs.
+
+You can use the Swagger2markup http://swagger2markup.github.io/swagger2markup/1.3.1/#extension_import_files[Dynamic file import extension]
+and the http://swagger2markup.github.io/swagger2markup/1.3.1/#_pathsdocumentextension[PathsDocumentExtension] point to
+import sample requests and responses into the generated API documentation.
+
+You add the samples as follows:
+
+. Ensure that the `swagger2markup.extensions.dynamicPaths.contentPath` property is set in the docs module's`build.gradle`.
+Typically this is:
+
+  src/asciidoc/extensions/paths
+
+. Create a directory under the content path and name it the same as the API method name (if unique) or the `ApiOperation` nickname.
+. In the new directory, create an AsciiDoc file called `operation-end-sample`.
+. Call the API either by running an acceptance test or using cURL or Postman.
+. Copy the output into the `operation-end-sample` file.
+
+.Sample request and response
+....
+[[getWidget.sample]]
+== Sample request and response markup
+
+[source,role="primary"]
+.Request
+----
+GET https://api.example.com/api/widgets/6cef9e60-8d30-40d5-bbab-c22e6eca9927/users/f6486748-4f6b-4274-9cd4-769ef0671e24
+Accept: application/json
+----
+[source,role="secondary"]
+.Response
+----
+200
+Content-Type: application/json
+Date: Mon, 10 Feb 2020 14:34:50 GMT
+{
+"uid": "f6486748-4f6b-4274-9cd4-769ef0671e24",
+"foo": "bar"
+}
+----
+....
+
+

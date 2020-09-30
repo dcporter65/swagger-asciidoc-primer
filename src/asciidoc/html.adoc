@@ -1,0 +1,286 @@
+== Generating HTML and PDF
+
+Once you have an AsciiDoc version of your API reference, you can combine it with other manually-maintained AsciiDoc
+documentation, such as an introductory chapter, and generate the final output as HTML or PDF.
+
+To do this, you use the https://github.com/asciidoctor/asciidoctor-gradle-plugin[Asciidoctor Gradle plugin]. Once again,
+you declare the dependency in the docs module's Gradle build script:
+
+.Configuring the Asciidoctor Gradle plugin
+====
+[source,groovy,role="primary"]
+.build.gradle
+----
+plugins {
+    id 'org.asciidoctor.jvm.convert' version '3.1.0'
+    id 'org.asciidoctor.jvm.pdf' version '3.1.0'
+}
+
+repositories {
+    maven {
+        url "https://repo.spring.io/release"
+    }
+    mavenCentral()
+}
+
+configurations {
+    asciidoctorExt
+}
+
+dependencies {
+    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
+}
+
+ext {
+    asciiDocOutputDir = file("${buildDir}/asciidoc/generated")
+    docBuildDir = file("${project.buildDir}/doc")
+}
+
+asciidoctor {
+    configurations 'asciidoctorExt'
+    sourceDir = file("src/asciidoc/")
+    baseDirFollowsSourceFile()
+    sources {
+        include 'widget-apiguide.adoc'
+    }
+    outputOptions{
+        backends = ['html5', 'pdf']
+        separateOutputDirs = false
+    }
+    resources {
+        from(sourceDir) {
+            include 'images/**'
+        }
+        from(sourceDir) {
+            include 'assets/js/**'
+        }
+    }
+
+    outputDir docBuildDir
+    backends = ['html5', 'pdf']
+    attributes = [
+        'docinfo': 'shared',
+        'doctype': 'book',
+        'generated': asciiDocOutputDir,
+        'pdf-stylesdir': 'theme',
+        'pdf-style': 'acme',
+        'revnumber': version,
+        'source-highlighter': 'prettify',
+        'toc': 'left',
+        'toclevels': '3'
+    ]
+}
+----
+[source,kotlin,role="secondary"]
+.build.gradle.kts
+----
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
+
+plugins {
+    id("org.asciidoctor.jvm.convert") version "3.2.0"
+    id("org.asciidoctor.jvm.pdf")  version "3.2.0"
+}
+
+repositories {
+    maven {
+        url = uri("https://repo.spring.io/release")
+    }
+    jcenter()
+}
+
+val asciidoctorExt by configurations.creating
+
+dependencies {
+    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
+}
+
+tasks.withType<AsciidoctorTask> {
+    configurations("asciidoctorExt")
+    dependsOn(tasks.getByName("clean").name, tasks.getByName("convertSwagger2markup").name)
+    setSourceDir(file("${project.rootDir}/docs/asciidoc"))
+    outputs.upToDateWhen { false }
+    outputOptions {
+        backends("html5", "pdf")
+        separateOutputDirs = false
+    }
+    sources(delegateClosureOf<PatternSet> {
+        include("widget-apiguide.adoc")
+    })
+
+    baseDirFollowsSourceDir()
+    this.attributes(
+            mapOf(
+                    "docinfo"            to "shared",
+                    "doctype"            to "book",
+                    "generated"          to file("${buildDir}/asciidoc/generated"),
+                    "pdf-stylesdir"      to "theme",
+                    "pdf-style"          to "acme",
+                    "sectanchors"        to "true",
+                    "source-highlighter" to "prettify",
+                    "toc"                to "left",
+                    "toclevels"          to "3")
+    )
+}
+----
+====
+
+You generate the HTML and PDF by running the `asciidoctor` Gradle task.
+
+The Asciidoctor plugin depends on two other libraries:
+
+* https://github.com/asciidoctor/asciidoctorj-pdf[AsciidoctorJPDF] is used for PDF generation
+* https://github.com/spring-io/spring-asciidoctor-extensions[Spring Asciidoctor Extensions] post-processes Asciidoctor’s
+HTML output to collapse multiple code blocks into one that provides side-by-side code samples.
+
+The extensions are stored in the https://repo.spring.io/release[repo.spring.io] Artifactory repository, which is
+included in the`repositories` section of the Gradle build script.
+
+=== Including side-by-side code snippets
+
+Instead of displaying code samples one below the other, as is the default, it can look good to render them in a
+side-by-side tabbed view in the generated HTML.
+
+For this you can use the block switch extension in the https://github.com/spring-io/spring-asciidoctor-extensions[Spring Asciidoctor Extensions] library.
+
+Add the following dependency as a configuration to your Gradle build script:
+
+====
+[source,groovy,role="primary"]
+.build.gradle
+----
+configurations {
+    asciidoctorExt
+}
+
+dependencies {
+     asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
+}
+----
+[source,kotlin,role="secondary"]
+.build.gradle.kts
+----
+val asciidoctorExt by configurations.creating
+
+dependencies {
+    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
+}
+----
+====
+
+And add the configuration to the `asciidoctor` task:
+
+====
+[source,groovy,role="primary"]
+.build.gradle
+----
+asciidoctor {
+    configurations 'asciidoctorExt'
+}
+----
+[source,kotlin,role="secondary"]
+.build.gradle.kts
+----
+tasks.withType<AsciidoctorTask> {
+    configurations("asciidoctorExt")
+}
+----
+====
+
+You also need to add a `role` attribute to each of the source code blocks.
+There must be one 'primary' role and at least one 'secondary' role.
+
+So this markup:
+
+....
+====
+[source,groovy,role="primary"]
+.Gradle
+----
+implementation 'com.acme.widget.client:2.1.1'
+----
+
+[source,xml,role="secondary"]
+.Maven
+----
+<dependency>
+  <groupId>com.acme.widget</groupId>
+  <artifactId>client</artifactId>
+  <version>2.1.1</version>
+</dependency>
+----
+====
+....
+
+&#8230; is rendered like this:
+
+ifndef::backend-pdf,env-github[]
+====
+[source,groovy,role="primary"]
+.Gradle
+----
+implementation 'com.acme.widget.client:2.1.1'
+----
+[source,xml,role="secondary"]
+.Maven
+----
+<dependency>
+  <groupId>com.acme.widget.client</groupId>
+  <artifactId>entertainment-client</artifactId>
+  <version>2.1.1</version>
+</dependency>
+----
+====
+endif::[]
+
+ifdef::backend-pdf,env-github[]
+image::code_tabs.png[]
+endif::[]
+
+
+=== Styling and themes
+
+You use a https://asciidoctor.org/docs/user-manual/#docinfo-file[docinfo] file to override Asciidoctor's default CSS styling for HTML output.
+
+The file should be named `docinfo.html` and be stored alongside your AsciiDoc source document.
+
+.Example docinfo.html
+[source,html]
+----
+<style>
+    a:hover, a:active, a:focus {
+        text-decoration:none;
+        color:#009fe3;
+    }
+    .listingblock .switch {
+        border-color: #0061a0;
+    }
+    .switch .switch--item {
+        color: #0061a0;
+    }
+    .switch .switch--item.selected {
+        background-color: #0061a0;
+        color: #ffffff;
+    }
+    .switch .switch--item:not(:first-child) {
+        border-color: #0061a0;
+    }
+</style>
+----
+
+For PDF output you use the https://github.com/asciidoctor/asciidoctor-pdf/blob/master/docs/theming-guide.adoc[theming] system.
+These two lines in the Asciidoctor configuration in the `build.gradle` govern the themes used:
+
+.Theming configuration
+----
+'pdf-stylesdir' : 'theme',
+'pdf-style' : 'my_theme'
+----
+
+
+=== Including an expandable TOC
+
+The default HTML output displays the table of contents as a simple list in the left-hand navigation frame.
+You can use the https://tscanlin.github.io/tocbot/[Tocbot] JavaScript library to render an expandable TOC.
+
+
+

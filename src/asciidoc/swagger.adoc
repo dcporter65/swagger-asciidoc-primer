@@ -1,0 +1,189 @@
+== Generating a Swagger spec
+
+https://swagger.io/[Swagger] is an open source framework backed by a large ecosystem of tools that helps developers
+design, build, document, and consume RESTful Web services. At its heart is the
+https://swagger.io/specification/v2/[Swagger Specification] which is used to describe a RESTful API in JSON or YAML format.
+
+The Swagger spec became the https://swagger.io/specification/[OpenApi Specification] in version 3.0. The examples shown
+here use Swagger 2.0, since the swagger2markup tool used to generate the documentation has not yet caught up with the 3.0 standard.
+
+You can choose to generate a Swagger specification from your API at either build time or runtime.
+
+=== Design first or code first?
+
+Swagger can take either a design-first or code-first approach to API development.
+
+The design-first approach involves writing a Swagger or OpenAPI specification in JSON or YAML, circulating the
+specification to stakeholders for approval, and generating code from the specification. In this scenario, the API
+specification is the single source of truth for the API.
+
+Code-first means that developers write the APIs using an appropriate RESTful coding framework, such as JAX-RS or Spring
+MVC, and add Swagger annotations to the code during the development process. A Swagger specification is then generated
+from the code either at build time or at runtime. In this case, the code is the single source of truth.
+
+This document deals with the code-first approach.
+
+=== Swagger annotations
+
+You add https://github.com/swagger-api/swagger-core/wiki/annotations-1.5.x[Swagger annotations] to your API code to ensure
+that a Swagger spec is generated at run or build time.
+
+You declare the dependency on the Swagger Annotations library in the `build.gradle` in the project's API server module
+as follows:
+
+.Swagger Annotations dependency in build.gradle
+[source,groovy]
+----
+dependencies {
+
+  compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.17'
+
+}
+----
+
+And then you add Swagger annotations to the resource classes, for JAX-RS projects, or to the controller classes in Spring
+MVC. For example:
+
+.Annotating a controller class
+[source,java]
+----
+@Controller
+@RequestMapping(value = "/pets", produces = "application/json")
+@Api(value = "/pets", tags = "Pets", description = "Operations about pets")
+public class PetController {
+
+@RequestMapping(method = POST)
+  @ApiOperation(value = "Add a new pet to the store")
+  @ApiResponses(value = {@ApiResponse(code = 405, message = "Invalid input")})
+  public ResponseEntity<String> addPet(
+          @ApiParam(value = "Pet object that needs to be added to the store", required = true) @RequestBody Pet pet) {
+    petData.add(pet);
+    return Responses.ok("SUCCESS");
+  }
+}
+----
+
+Here are some of the most useful Swagger annotations:
+
+[cols=",,",options="header",]
+|===
+|Annotation |Description |Attributes
+
+|`@Api` |Marks the class as a Swagger resource.  a|
+
+`tags` – Groups all the APIs in this class under a particular heading in the documentation
+
+`description` – Adds a further description for this group of APIs
+
+|`@ApiOperation` |Used to document an individual API, usually a unique combination of HTTP method and resource path a|
+
+`value` – The name of the API. Appears as a section title in the generated documentation. For example "Get widget". Does
+not end with a full stop (period).
+
+`notes` – A more detailed description of what the API does, written as one or more sentences. For example, "Returns the
+widget specified by the widgetUid parameter."
+
+`nickname` – Often required where the API method name is not unique across the project. For example, some projects use
+the method names `get`, `create`, and `update` in every resource class. For example, "getWidget"
+
+`response` – Where the response object cannot be inferred from the response statement in the code, you may need to use
+this annotation to set the name of the response class.
+
+`code` – The HTTP response code that is returned when this API is called successfully. Defaults to 200, so you need to
+set this for APIs that return 201, 202, and 204. Alternatively, you can set this in the @ApiResponse annotation.
+
+|@ApiParam |Used to document parameters that can be sent when the API is called. a|
+
+`value` – A description of the parameter that appears in the generated documentation.
+
+`required` – A boolean showing whether the parameter is required. Defaults to false.
+
+`allowableValues` – A comma-separated list of allowable values.
+
+|`@ApiResponses` |Use this annotation where the response to a successful API call cannot be inferred from the code.
+
+|None. Contains a list of `@ApiResponse` annotations.
+
+|`@ApiResponse` |Defines an API response a|
+
+`code` – The HTTP response code that is returned when this API is called successfully.
+
+`message` – The message that accompanies the HTTP response, for example 'No content'.
+
+`response` – The name of the response class.
+
+|===
+
+Where an API consumes a JSON object in the body of a request or produces JSON in the response, the model of the JSON
+object is included in the generated `swagger.json`. You can add documentation to the model classes using the `@ApiModel`
+and  `@ApiModelProperty` annotations. For example:
+
+.Annotating a model class
+[source,groovy]
+----
+class CredentialsModel {
+  @ApiModelProperty(required = true) String username
+  @ApiModelProperty(required = true) String password
+}
+----
+
+See the https://github.com/swagger-api/swagger-core/wiki/annotations-1.5.x[Swagger Annotations documentation] for more details.
+
+=== Generating Swagger at Build Time
+
+The https://github.com/gigaSproule/swagger-gradle-plugin[Swagger Gradle Plugin] allows you to  generate a `swagger.json`
+file at build time.
+
+NOTE: If you are using Maven as your build tool, you can use the https://github.com/kongchen/swagger-maven-plugin[Swagger Maven Plugin].
+
+The dependency on this plugin and its configuration is declared in the `build.gradle` for each project's API server module.
+
+.Swagger Gradle Plugin config in build.gradle
+[source,groovy]
+----
+plugins {
+    id 'com.benjaminsproule.swagger'
+    version '1.0.4'
+}
+
+swagger {
+    apiSource {
+        springmvc = false
+        locations = ['com.acme.widget.api.resources']
+        schemes = ['http', 'https']
+        host = '{{host}}'
+        basePath = '/api'
+
+        info {
+            title = 'Widget API'
+            version = 'v1'
+            description = 'This is the API for the Widget service.'
+            termsOfService = 'http://www.example.com/termsOfService'
+            contact {
+                email = 'engineering@acme.com'
+                name = 'Widget'
+                url = 'http://www.widgetinc.com/'
+            }
+        }
+        swaggerDirectory = "${project(':widget-docs').buildDir}/swagger"
+    }
+}
+
+generateSwaggerDocumentation.dependsOn(compileGroovy)
+----
+
+The `swagger.json` is generated by the `generateSwaggerDocumentation` Gradle task and is written to a `swagger` folder
+under the docs module's `build` directory.
+
+=== Generating Swagger at Runtime
+
+There are a number of libraries that allow you to generate a Swagger or OpenAPI specification, as well as a https://swagger.io/tools/swagger-ui/[Swagger UI]
+API console at runtime. Here are a few that are used in the Java space:
+
+* https://github.com/swagger-api/swagger-core[Swagger Core]
+* http://springfox.github.io/springfox/[Springfox] - for projects that rely on the Spring Framework
+* https://springdoc.org/[springdoc-openapi] - for projects that use Spring Boot
+
+All these libraries expose a `swagger.json` or `openapi.json` at an HTTP URL when the API server is running.
+You can create a test that writes the JSON to a file in your project, so that you can proceed to the next step.
+

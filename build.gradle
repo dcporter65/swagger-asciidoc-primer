@@ -21,7 +21,7 @@ asciidoctorj {
 }
 
 dependencies {
-    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.2.RELEASE'
+    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
 }
 
 asciidoctor {
