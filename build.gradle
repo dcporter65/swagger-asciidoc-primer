@@ -1,6 +1,8 @@
+
 plugins {
     id 'org.asciidoctor.jvm.convert' version '3.1.0'
     id 'org.asciidoctor.jvm.pdf' version '3.1.0'
+    id 'org.ajoberstar.git-publish' version '3.0.0'
 }
 
 repositories {
@@ -46,3 +48,12 @@ asciidoctor {
             'toclevels'         : '3'
     ]
 }
+
+gitPublish {
+    repoUri = 'git@github.com:dcp65/swagger-asciidoc-primer.git'
+    branch = 'gh-pages'
+    contents {
+        from 'build'
+    }
+}
+
