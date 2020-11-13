@@ -3,7 +3,9 @@
 :imagesdir: ./images
 
 This guide explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
-documentation for your RESTful APIs.
+documentation for your RESTful APIs. The document source is available at:
+
+https://github.com/dcp65/swagger-asciidoc-primer
 
 == Process overview
 
