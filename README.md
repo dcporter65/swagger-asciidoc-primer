@@ -11,4 +11,8 @@ To view the generated documentation, clone this repository and run the following
 
 Generated HTML and PDF is available in the project `build` directory.
 
-Alternatively, you can view the document, as rendered by GitHub, from the [project source](./src/asciidoc/index.adoc).
+The document is published to GitHub Pages using the ghp-import tool.
+
+The published document is here:
+
+https://dcp65.github.io/swagger-asciidoc-primer/

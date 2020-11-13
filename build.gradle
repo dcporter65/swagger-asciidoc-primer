@@ -2,7 +2,7 @@
 plugins {
     id 'org.asciidoctor.jvm.convert' version '3.1.0'
     id 'org.asciidoctor.jvm.pdf' version '3.1.0'
-    id 'org.ajoberstar.git-publish' version '3.0.0'
+    id 'ru.vyarus.use-python' version '2.2.0'
 }
 
 repositories {
@@ -49,11 +49,11 @@ asciidoctor {
     ]
 }
 
-gitPublish {
-    repoUri = 'git@github.com:dcp65/swagger-asciidoc-primer.git'
-    branch = 'gh-pages'
-    contents {
-        from 'build'
-    }
-}
+python.pip 'ghp-import:1.0.0'
 
+task publishDoc(type: PythonTask) {
+    group = "documentation"
+    description = "Publish the generated output to GitHub Pages"
+    module = 'ghp_import'
+    command "-p $buildDir"
+}

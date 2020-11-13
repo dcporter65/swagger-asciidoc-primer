@@ -1,7 +1,7 @@
 == Generating a Swagger spec
 
 https://swagger.io/[Swagger] is an open source framework backed by a large ecosystem of tools that helps developers
-design, build, document, and consume RESTful Web services. At its heart is the
+design, build, document, and consume RESTful Web services. At its heart is the
 https://swagger.io/specification/v2/[Swagger Specification] which is used to describe a RESTful API in JSON or YAML format.
 
 The Swagger spec became the https://swagger.io/specification/[OpenApi Specification] in version 3.0. The examples shown
