@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Documenting APIs with Swagger and AsciiDoc</title>
+<title>Block switch example in separate source file</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -477,823 +477,155 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     }
 
 </style>
+<style>
+.hidden {
+	display: none;
+}
+
+.switch {
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+	display: inline-block;
+}
+
+.switch--item {
+	padding: 10px;
+	background-color: #ffffff;
+	color: #7a2518;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+	border-width: 0 0 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+}
+
+.switch--item.selected {
+	background-color: #7a2519;
+	color: #ffffff;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+	$('.primary').each(function() {
+		primary = $(this);
+		createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+		primary.children('.title').remove();
+	});
+	$('.secondary').each(function(idx, node) {
+		secondary = $(node);
+		primary = findPrimary(secondary);
+		switchItem = createSwitchItem(secondary, primary.children('.switch'));
+		switchItem.content.addClass('hidden');
+		findPrimary(secondary).append(switchItem.content);
+		secondary.remove();
+	});
+}
+
+function createBlockSwitch(primary) {
+	blockSwitch = $('<div class="switch"></div>');
+	primary.prepend(blockSwitch);
+	return blockSwitch;
+}
+
+function findPrimary(secondary) {
+	candidate = secondary.prev();
+	while (!candidate.is('.primary')) {
+		candidate = candidate.prev();
+	}
+	return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+	blockName = block.children('.title').text();
+	content = block.children('.content').first().append(block.next('.colist'));
+	item = $('<div class="switch--item">' + blockName + '</div>');
+	blockSwitch.append(item);
+	return {'item': item, 'content': content};
+}
+
+function globalSwitch() {
+	$('.switch--item').each(function() {
+		var blockId = blockIdForSwitchItem($(this));
+		$(this).off('click');
+		$(this).on('click', function() {
+			selectedText = $(this).text()
+			window.localStorage.setItem(blockId, selectedText);
+			$(".switch--item").filter(function() {
+				return blockIdForSwitchItem($(this)) === blockId;
+			}).filter(function() {
+				return $(this).text() === selectedText;
+			}).each(function() {
+				select($(this))
+			});
+		});
+		if ($(this).text() === window.localStorage.getItem(blockId)) {
+			select($(this))
+		}
+	});
+}
+
+function blockIdForSwitchItem(item) {
+	idComponents = []
+	idComponents.push(item.text().toLowerCase());
+	item.siblings(".switch--item").each(function(index, sibling) {
+		idComponents.push($(sibling).text().toLowerCase());
+	});
+	return idComponents.sort().join("-")
+}
+
+function select(selected) {
+	selected.addClass('selected');
+	selected.siblings().removeClass('selected');
+	selectedContent = selected.parent().siblings(".content").eq(selected.index())
+	selectedContent.removeClass('hidden');
+	selectedContent.siblings().addClass('hidden');
+}
+
+$(addBlockSwitches);
+$(globalSwitch);
+
+</script>
+
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>Documenting APIs with Swagger and AsciiDoc</h1>
+<h1>Block switch example in separate source file</h1>
 <div class="details">
-<span id="revnumber"> </span>
+<span id="revnumber">version </span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_process_overview">Process overview</a></li>
-<li><a href="#_generating_a_swagger_spec">Generating a Swagger spec</a>
-<ul class="sectlevel2">
-<li><a href="#_design_first_or_code_first">Design first or code first?</a></li>
-<li><a href="#_swagger_annotations">Swagger annotations</a></li>
-<li><a href="#_generating_swagger_at_build_time">Generating Swagger at build time</a></li>
-<li><a href="#_generating_swagger_at_runtime">Generating Swagger at runtime</a></li>
-</ul>
-</li>
-<li><a href="#_converting_swagger_to_asciidoc">Converting Swagger to AsciiDoc</a>
-<ul class="sectlevel2">
-<li><a href="#_about_asciidoc">About AsciiDoc</a></li>
-<li><a href="#_swagger2markup">Swagger2markup</a></li>
-<li><a href="#_including_sample_requests_and_responses">Including sample requests and responses</a></li>
-</ul>
-</li>
-<li><a href="#_generating_html_and_pdf">Generating HTML and PDF</a>
-<ul class="sectlevel2">
-<li><a href="#_including_side_by_side_code_snippets">Including side-by-side code snippets</a>
-<ul class="sectlevel3">
-<li><a href="#_block_switch_plugin_ignored_issue">Block-switch plugin ignored issue</a></li>
-</ul>
-</li>
-<li><a href="#_styling_and_themes">Styling and themes</a></li>
-<li><a href="#_including_an_expandable_toc">Including an expandable TOC</a></li>
-</ul>
-</li>
+<li><a href="#_code_sample">Code sample</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>This guide explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
-documentation for your RESTful APIs. The document source is available at:</p>
-</div>
-<div class="paragraph">
-<p><a href="https://github.com/dcp65/swagger-asciidoc-primer" class="bare">https://github.com/dcp65/swagger-asciidoc-primer</a></p>
-</div>
-</div>
-</div>
 <div class="sect1">
-<h2 id="_process_overview"><a class="anchor" href="#_process_overview"></a>Process overview</h2>
+<h2 id="_code_sample"><a class="anchor" href="#_code_sample"></a>Code sample</h2>
 <div class="sectionbody">
-<div class="imageblock">
-<div class="content">
-<img src="./images/diagram.png" alt="diagram" width="628" height="385">
-</div>
-<div class="title">Figure 1. Generating documentation</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_generating_a_swagger_spec"><a class="anchor" href="#_generating_a_swagger_spec"></a>Generating a Swagger spec</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p><a href="https://swagger.io/">Swagger</a> is an open source framework backed by a large ecosystem of tools that helps developers
-design, build, document, and consume RESTful Web services. At its heart is the
-<a href="https://swagger.io/specification/v2/">Swagger Specification</a> which is used to describe a RESTful API in JSON or YAML format.</p>
-</div>
-<div class="paragraph">
-<p>The Swagger spec became the <a href="https://swagger.io/specification/">OpenApi Specification</a> in version 3.0. The examples shown
-here use Swagger 2.0, since the swagger2markup tool used to generate the documentation has not yet caught up with the 3.0 standard.</p>
-</div>
-<div class="paragraph">
-<p>You can choose to generate a Swagger specification from your API at either build time or runtime.</p>
-</div>
-<div class="sect2">
-<h3 id="_design_first_or_code_first"><a class="anchor" href="#_design_first_or_code_first"></a>Design first or code first?</h3>
-<div class="paragraph">
-<p>Swagger can take either a design-first or code-first approach to API development.</p>
-</div>
-<div class="paragraph">
-<p>The design-first approach involves writing a Swagger or OpenAPI specification in JSON or YAML, circulating the
-specification to stakeholders for approval, and generating code from the specification. In this scenario, the API
-specification is the single source of truth for the API.</p>
-</div>
-<div class="paragraph">
-<p>Code-first means that developers write the APIs using an appropriate RESTful coding framework, such as JAX-RS or Spring
-MVC, and add Swagger annotations to the code during the development process. A Swagger specification is then generated
-from the code either at build time or at runtime. In this case, the code is the single source of truth.</p>
-</div>
-<div class="paragraph">
-<p>This document deals with the code-first approach.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_swagger_annotations"><a class="anchor" href="#_swagger_annotations"></a>Swagger annotations</h3>
-<div class="paragraph">
-<p>You add <a href="https://github.com/swagger-api/swagger-core/wiki/annotations-1.5.x">Swagger annotations</a> to your API code to ensure
-that a Swagger spec is generated at run or build time.</p>
-</div>
-<div class="paragraph">
-<p>You declare the dependency on the Swagger Annotations library in the <code>build.gradle</code> in the project&#8217;s API server module
-as follows:</p>
-</div>
-<div class="listingblock">
-<div class="title">Swagger Annotations dependency in build.gradle</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">dependencies {
-
-  compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.17'
-
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>And then you add Swagger annotations to the resource classes, for JAX-RS projects, or to the controller classes in Spring
-MVC. For example:</p>
-</div>
-<div class="listingblock">
-<div class="title">Annotating a controller class</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="java">@Controller
-@RequestMapping(value = "/pets", produces = "application/json")
-@Api(value = "/pets", tags = "Pets", description = "Operations about pets")
-public class PetController {
-
-@RequestMapping(method = POST)
-  @ApiOperation(value = "Add a new pet to the store")
-  @ApiResponses(value = {@ApiResponse(code = 405, message = "Invalid input")})
-  public ResponseEntity&lt;String&gt; addPet(
-          @ApiParam(value = "Pet object that needs to be added to the store", required = true) @RequestBody Pet pet) {
-    petData.add(pet);
-    return Responses.ok("SUCCESS");
-  }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Here are some of the most useful Swagger annotations:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 16.6666%;">
-<col style="width: 33.3333%;">
-<col style="width: 50.0001%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Annotation</th>
-<th class="tableblock halign-left valign-top">Description</th>
-<th class="tableblock halign-left valign-top">Attributes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@Api</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Marks the class as a Swagger resource.</p></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p><code>tags</code> – Groups all the APIs in this class under a particular heading in the documentation</p>
-</div>
-<div class="paragraph">
-<p><code>description</code> – Adds a further description for this group of APIs</p>
-</div></div></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@ApiOperation</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Used to document an individual API, usually a unique combination of HTTP method and resource path</p></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p><code>value</code> – The name of the API. Appears as a section title in the generated documentation. For example "Get widget". Does
-not end with a full stop (period).</p>
-</div>
-<div class="paragraph">
-<p><code>notes</code> – A more detailed description of what the API does, written as one or more sentences. For example, "Returns the
-widget specified by the widgetUid parameter."</p>
-</div>
-<div class="paragraph">
-<p><code>nickname</code> – Often required where the API method name is not unique across the project. For example, some projects use
-the method names <code>get</code>, <code>create</code>, and <code>update</code> in every resource class. For example, "getWidget"</p>
-</div>
-<div class="paragraph">
-<p><code>response</code> – Where the response object cannot be inferred from the response statement in the code, you may need to use
-this annotation to set the name of the response class.</p>
-</div>
-<div class="paragraph">
-<p><code>code</code> – The HTTP response code that is returned when this API is called successfully. Defaults to 200, so you need to
-set this for APIs that return 201, 202, and 204. Alternatively, you can set this in the @ApiResponse annotation.</p>
-</div></div></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">@ApiParam</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Used to document parameters that can be sent when the API is called.</p></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p><code>value</code> – A description of the parameter that appears in the generated documentation.</p>
-</div>
-<div class="paragraph">
-<p><code>required</code> – A boolean showing whether the parameter is required. Defaults to false.</p>
-</div>
-<div class="paragraph">
-<p><code>allowableValues</code> – A comma-separated list of allowable values.</p>
-</div></div></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@ApiResponses</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Use this annotation where the response to a successful API call cannot be inferred from the code.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">None. Contains a list of <code>@ApiResponse</code> annotations.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>@ApiResponse</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Defines an API response</p></td>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p><code>code</code> – The HTTP response code that is returned when this API is called successfully.</p>
-</div>
-<div class="paragraph">
-<p><code>message</code> – The message that accompanies the HTTP response, for example 'No content'.</p>
-</div>
-<div class="paragraph">
-<p><code>response</code> – The name of the response class.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>Where an API consumes a JSON object in the body of a request or produces JSON in the response, the model of the JSON
-object is included in the generated <code>swagger.json</code>. You can add documentation to the model classes using the <code>@ApiModel</code>
-and  <code>@ApiModelProperty</code> annotations. For example:</p>
-</div>
-<div class="listingblock">
-<div class="title">Annotating a model class</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">class CredentialsModel {
-  @ApiModelProperty(required = true) String username
-  @ApiModelProperty(required = true) String password
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>See the <a href="https://github.com/swagger-api/swagger-core/wiki/annotations-1.5.x">Swagger Annotations documentation</a> for more details.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_generating_swagger_at_build_time"><a class="anchor" href="#_generating_swagger_at_build_time"></a>Generating Swagger at build time</h3>
-<div class="paragraph">
-<p>The <a href="https://github.com/gigaSproule/swagger-gradle-plugin">Swagger Gradle Plugin</a> allows you to  generate a <code>swagger.json</code>
-file at build time.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-If you are using Maven as your build tool, you can use the <a href="https://github.com/kongchen/swagger-maven-plugin">Swagger Maven Plugin</a>.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The dependency on this plugin and its configuration is declared in the <code>build.gradle</code> for each project&#8217;s API server module.</p>
-</div>
-<div class="listingblock">
-<div class="title">Swagger Gradle Plugin config in build.gradle</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">plugins {
-    id 'com.benjaminsproule.swagger'
-    version '1.0.4'
-}
-
-swagger {
-    apiSource {
-        springmvc = false
-        locations = ['com.acme.widget.api.resources']
-        schemes = ['http', 'https']
-        host = '{{host}}'
-        basePath = '/api'
-
-        info {
-            title = 'Widget API'
-            version = 'v1'
-            description = 'This is the API for the Widget service.'
-            termsOfService = 'http://www.example.com/termsOfService'
-            contact {
-                email = 'engineering@acme.com'
-                name = 'Widget'
-                url = 'http://www.widgetinc.com/'
-            }
-        }
-        swaggerDirectory = "${project(':widget-docs').buildDir}/swagger"
-    }
-}
-
-generateSwaggerDocumentation.dependsOn(compileGroovy)</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>swagger.json</code> is generated by the <code>generateSwaggerDocumentation</code> Gradle task and is written to a <code>swagger</code> folder
-under the docs module&#8217;s <code>build</code> directory.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_generating_swagger_at_runtime"><a class="anchor" href="#_generating_swagger_at_runtime"></a>Generating Swagger at runtime</h3>
-<div class="paragraph">
-<p>There are a number of libraries that allow you to generate a Swagger or OpenAPI specification, as well as a <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>
-API console at runtime. Here are a few that are used in the Java space:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://github.com/swagger-api/swagger-core">Swagger Core</a></p>
-</li>
-<li>
-<p><a href="http://springfox.github.io/springfox/">Springfox</a> - for projects that rely on the Spring Framework</p>
-</li>
-<li>
-<p><a href="https://springdoc.org/">springdoc-openapi</a> - for projects that use Spring Boot</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>All these libraries expose a <code>swagger.json</code> or <code>openapi.json</code> at an HTTP URL when the API server is running.
-You can create a test that writes the JSON to a file in your project, so that you can proceed to the next step.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_converting_swagger_to_asciidoc"><a class="anchor" href="#_converting_swagger_to_asciidoc"></a>Converting Swagger to AsciiDoc</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Once you have generated the Swagger specification you can use the Swagger2markup library to convert it to AsciiDoc.</p>
-</div>
-<div class="sect2">
-<h3 id="_about_asciidoc"><a class="anchor" href="#_about_asciidoc"></a>About AsciiDoc</h3>
-<div class="paragraph">
-<p><a href="http://asciidoc.org/">AsciiDoc</a> is an easy-to-use, lightweight markup language that is well supported by a wide range of
-open source tools. It is similar to Markdown but is sophisticated enough to support many of the book-authoring features
-provided by more complicated specifications such as DocBook and DITA. <a href="https://asciidoctor.org/">Asciidoctor</a> is a toolchain
-used for processing AsciiDoc and converting it to various formats including HTML and PDF.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_swagger2markup"><a class="anchor" href="#_swagger2markup"></a>Swagger2markup</h3>
-<div class="paragraph">
-<p>The Swagger-to-AsciiDoc conversion is handled by the
-<a href="https://github.com/Swagger2Markup/swagger2markup-gradle-plugin">Swagger2markup Gradle plugin</a>.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-See the <a href="https://github.com/Swagger2Markup/swagger2markup-maven-plugin">Swagger2markup Maven plugin</a> if you are using
-Maven.
-</td>
-</tr>
-</table>
-</div>
-<div class="exampleblock">
-<div class="title">Example 1. Configuring the Swagger2markup Gradle plugin</div>
-<div class="content">
 <div class="listingblock primary">
-<div class="title">build.gradle</div>
+<div class="title">Request</div>
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">buildscript {
-
-    dependencies {
-        classpath "io.github.swagger2markup:swagger2markup-gradle-plugin:1.3.3"
-        classpath "io.github.swagger2markup:swagger2markup-import-files-ext:1.3.3"
-    }
-}
-
-apply plugin: 'io.github.swagger2markup'
-
-convertSwagger2markup {
-    dependsOn(':mm-api-server:generateSwaggerDocumentation')
-    swaggerInput "${project.buildDir}/swagger/swagger.json"
-    outputDir file("${buildDir}/asciidoc/generated")
-    config = [
-        'swagger2markup.pathsGroupedBy': 'TAGS',
-        'swagger2markup.extensions.dynamicPaths.contentPath': file('src/asciidoc/extensions/paths').absolutePath
-    ]
-}</code></pre>
+<pre class="prettyprint highlight"><code data-lang="http request">GET https://api.example.com/api/widgets/6cef9e60-8d30-40d5-bbab-c22e6eca9927/users/f6486748-4f6b-4274-9cd4-769ef0671e24
+Accept: application/json</code></pre>
 </div>
 </div>
 <div class="listingblock secondary">
-<div class="title">build.gradle.kts</div>
+<div class="title">Response</div>
 <div class="content">
-<pre class="prettyprint highlight"><code data-lang="kotlin">import io.github.swagger2markup.tasks.Swagger2MarkupTask
-
-buildscript {
-    dependencies {
-        classpath("io.github.swagger2markup:swagger2markup-gradle-plugin:1.3.3")
-        classpath("io.github.swagger2markup:swagger2markup-import-files-ext:1.3.3")
-    }
-}
-
-apply(plugin = "io.github.swagger2markup")
-
-tasks.withType&lt;Swagger2MarkupTask&gt; {
-        swaggerInputFile = file("${project.buildDir}/swagger/swagger.json")
-        outputDir = file("${buildDir}/asciidoc/generated")
-        config = mapOf(
-                "swagger2markup.pathsGroupedBy" to "TAGS",
-                "swagger2markup.extensions.dynamicPaths.contentPath" to file("asciidoc/extensions/paths").absolutePath
-        )
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>The dependency on <code>swagger2markup-import-files-ext</code> and the <code>swagger2markup.extensions.dynamicPaths.contentPath</code>
-configuration relate to how sample requests and responses are included in the generated documentation.</p>
-</div>
-<div class="paragraph">
-<p>To convert the Swagger to AsciiDoc, run:</p>
-</div>
-<div class="paragraph">
-<p><code>./gradlew convertSwagger2markup</code></p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_including_sample_requests_and_responses"><a class="anchor" href="#_including_sample_requests_and_responses"></a>Including sample requests and responses</h3>
-<div class="paragraph">
-<p>It is good practice to include a sample request and response in the documentation for each your your APIs.</p>
-</div>
-<div class="paragraph">
-<p>You can use the Swagger2markup <a href="http://swagger2markup.github.io/swagger2markup/1.3.1/#extension_import_files">Dynamic file import extension</a>
-and the <a href="http://swagger2markup.github.io/swagger2markup/1.3.1/#_pathsdocumentextension">PathsDocumentExtension</a> point to
-import sample requests and responses into the generated API documentation.</p>
-</div>
-<div class="paragraph">
-<p>You add the samples as follows:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Ensure that the <code>swagger2markup.extensions.dynamicPaths.contentPath</code> property is set in the docs module&#8217;s`build.gradle`.
-Typically this is:</p>
-<div class="literalblock">
-<div class="content">
-<pre>src/asciidoc/extensions/paths</pre>
-</div>
-</div>
-</li>
-<li>
-<p>Create a directory under the content path and name it the same as the API method name (if unique) or the <code>ApiOperation</code> nickname.</p>
-</li>
-<li>
-<p>In the new directory, create an AsciiDoc file called <code>operation-end-sample</code>.</p>
-</li>
-<li>
-<p>Call the API either by running an acceptance test or using cURL or Postman.</p>
-</li>
-<li>
-<p>Copy the output into the <code>operation-end-sample</code> file.</p>
-</li>
-</ol>
-</div>
-<div class="literalblock">
-<div class="title">Sample request and response</div>
-<div class="content">
-<pre>[[getWidget.sample]]
-== Sample request and response markup
-
-[source,role="primary"]
-.Request
-----
-GET https://api.example.com/api/widgets/6cef9e60-8d30-40d5-bbab-c22e6eca9927/users/f6486748-4f6b-4274-9cd4-769ef0671e24
-Accept: application/json
-----
-[source,role="secondary"]
-.Response
-----
-200
+<pre class="prettyprint highlight"><code data-lang="json">200
 Content-Type: application/json
 Date: Mon, 10 Feb 2020 14:34:50 GMT
 {
 "uid": "f6486748-4f6b-4274-9cd4-769ef0671e24",
 "foo": "bar"
-}
-----</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_generating_html_and_pdf"><a class="anchor" href="#_generating_html_and_pdf"></a>Generating HTML and PDF</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Once you have an AsciiDoc version of your API reference, you can combine it with other manually-maintained AsciiDoc
-documentation, such as an introductory chapter, and generate the final output as HTML or PDF.</p>
-</div>
-<div class="paragraph">
-<p>To do this, you use the <a href="https://github.com/asciidoctor/asciidoctor-gradle-plugin">Asciidoctor Gradle plugin</a>. Once again,
-you declare the dependency in the docs module&#8217;s Gradle build script:</p>
-</div>
-<div class="exampleblock">
-<div class="title">Example 2. Configuring the Asciidoctor Gradle plugin</div>
-<div class="content">
-<div class="listingblock primary">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">plugins {
-    id 'org.asciidoctor.jvm.convert' version '3.1.0'
-    id 'org.asciidoctor.jvm.pdf' version '3.1.0'
-}
-
-repositories {
-    maven {
-        url "https://repo.spring.io/release"
-    }
-    mavenCentral()
-}
-
-configurations {
-    asciidoctorExt
-}
-
-dependencies {
-    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
-}
-
-ext {
-    asciiDocOutputDir = file("${buildDir}/asciidoc/generated")
-    docBuildDir = file("${project.buildDir}/doc")
-}
-
-asciidoctor {
-    configurations 'asciidoctorExt'
-    sourceDir = file("src/asciidoc/")
-    baseDirFollowsSourceFile()
-    sources {
-        include 'widget-apiguide.adoc'
-    }
-    outputOptions{
-        backends = ['html5', 'pdf']
-        separateOutputDirs = false
-    }
-    resources {
-        from(sourceDir) {
-            include 'images/**'
-        }
-        from(sourceDir) {
-            include 'assets/js/**'
-        }
-    }
-
-    outputDir docBuildDir
-    backends = ['html5', 'pdf']
-    attributes = [
-        'docinfo': 'shared',
-        'doctype': 'book',
-        'generated': asciiDocOutputDir,
-        'pdf-stylesdir': 'theme',
-        'pdf-style': 'acme',
-        'revnumber': version,
-        'source-highlighter': 'prettify',
-        'toc': 'left',
-        'toclevels': '3'
-    ]
 }</code></pre>
-</div>
-</div>
-<div class="listingblock secondary">
-<div class="title">build.gradle.kts</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="kotlin">import org.asciidoctor.gradle.jvm.AsciidoctorTask
-
-plugins {
-    id("org.asciidoctor.jvm.convert") version "3.2.0"
-    id("org.asciidoctor.jvm.pdf")  version "3.2.0"
-}
-
-repositories {
-    maven {
-        url = uri("https://repo.spring.io/release")
-    }
-    jcenter()
-}
-
-val asciidoctorExt by configurations.creating
-
-dependencies {
-    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
-}
-
-tasks.withType&lt;AsciidoctorTask&gt; {
-    configurations("asciidoctorExt")
-    dependsOn(tasks.getByName("clean").name, tasks.getByName("convertSwagger2markup").name)
-    setSourceDir(file("${project.rootDir}/docs/asciidoc"))
-    outputs.upToDateWhen { false }
-    outputOptions {
-        backends("html5", "pdf")
-        separateOutputDirs = false
-    }
-    sources(delegateClosureOf&lt;PatternSet&gt; {
-        include("widget-apiguide.adoc")
-    })
-
-    baseDirFollowsSourceDir()
-    this.attributes(
-            mapOf(
-                    "docinfo"            to "shared",
-                    "doctype"            to "book",
-                    "generated"          to file("${buildDir}/asciidoc/generated"),
-                    "pdf-stylesdir"      to "theme",
-                    "pdf-style"          to "acme",
-                    "sectanchors"        to "true",
-                    "source-highlighter" to "prettify",
-                    "toc"                to "left",
-                    "toclevels"          to "3")
-    )
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>You generate the HTML and PDF by running the <code>asciidoctor</code> Gradle task.</p>
-</div>
-<div class="paragraph">
-<p>The Asciidoctor plugin depends on two other libraries:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://github.com/asciidoctor/asciidoctorj-pdf">AsciidoctorJPDF</a> is used for PDF generation</p>
-</li>
-<li>
-<p><a href="https://github.com/spring-io/spring-asciidoctor-extensions">Spring Asciidoctor Extensions</a> post-processes Asciidoctor’s
-HTML output to collapse multiple code blocks into one that provides side-by-side code samples.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The extensions are stored in the <a href="https://repo.spring.io/release">repo.spring.io</a> Artifactory repository, which is
-included in the`repositories` section of the Gradle build script.</p>
-</div>
-<div class="sect2">
-<h3 id="_including_side_by_side_code_snippets"><a class="anchor" href="#_including_side_by_side_code_snippets"></a>Including side-by-side code snippets</h3>
-<div class="paragraph">
-<p>Instead of displaying code samples one below the other, as is the default, it can look good to render them in a
-side-by-side tabbed view in the generated HTML.</p>
-</div>
-<div class="paragraph">
-<p>For this you can use the block switch extension in the <a href="https://github.com/spring-io/spring-asciidoctor-extensions">Spring Asciidoctor Extensions</a> library.</p>
-</div>
-<div class="paragraph">
-<p>Add the following dependency as a configuration to your Gradle build script:</p>
-</div>
-<div class="exampleblock">
-<div class="content">
-<div class="listingblock primary">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">configurations {
-    asciidoctorExt
-}
-
-dependencies {
-     asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
-}</code></pre>
-</div>
-</div>
-<div class="listingblock secondary">
-<div class="title">build.gradle.kts</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="kotlin">val asciidoctorExt by configurations.creating
-
-dependencies {
-    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>And add the configuration to the <code>asciidoctor</code> task:</p>
-</div>
-<div class="exampleblock">
-<div class="content">
-<div class="listingblock primary">
-<div class="title">build.gradle</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">asciidoctor {
-    configurations 'asciidoctorExt'
-}</code></pre>
-</div>
-</div>
-<div class="listingblock secondary">
-<div class="title">build.gradle.kts</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="kotlin">tasks.withType&lt;AsciidoctorTask&gt; {
-    configurations("asciidoctorExt")
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>You also need to add a <code>role</code> attribute to each of the source code blocks.
-There must be one 'primary' role and at least one 'secondary' role.</p>
-</div>
-<div class="paragraph">
-<p>So this markup:</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>====
-[source,groovy,role="primary"]
-.Gradle
-----
-implementation 'com.acme.widget.client:2.1.1'
-----
-
-[source,xml,role="secondary"]
-.Maven
-----
-&lt;dependency&gt;
-  &lt;groupId&gt;com.acme.widget&lt;/groupId&gt;
-  &lt;artifactId&gt;client&lt;/artifactId&gt;
-  &lt;version&gt;2.1.1&lt;/version&gt;
-&lt;/dependency&gt;
-----
-====</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>&#8230; is rendered like this:</p>
-</div>
-<div class="exampleblock">
-<div class="content">
-<div class="listingblock primary">
-<div class="title">Gradle</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="groovy">implementation 'com.acme.widget.client:2.1.1'</code></pre>
-</div>
-</div>
-<div class="listingblock secondary">
-<div class="title">Maven</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="xml">&lt;dependency&gt;
-  &lt;groupId&gt;com.acme.widget.client&lt;/groupId&gt;
-  &lt;artifactId&gt;entertainment-client&lt;/artifactId&gt;
-  &lt;version&gt;2.1.1&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_block_switch_plugin_ignored_issue"><a class="anchor" href="#_block_switch_plugin_ignored_issue"></a>Block-switch plugin ignored issue</h4>
-<div class="paragraph">
-<p>This section highlights an issue where the switch plugin seems to be ignored where the <code>sources</code> closure in
-the <code>build.gradle</code> file includes more than one source file.</p>
-</div>
-<div class="paragraph">
-<p><a href="switch.html" target="_blank" rel="noopener">Block switch example in separate source file</a></p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_styling_and_themes"><a class="anchor" href="#_styling_and_themes"></a>Styling and themes</h3>
-<div class="paragraph">
-<p>You use a <a href="https://asciidoctor.org/docs/user-manual/#docinfo-file">docinfo</a> file to override Asciidoctor&#8217;s default CSS styling for HTML output.</p>
-</div>
-<div class="paragraph">
-<p>The file should be named <code>docinfo.html</code> and be stored alongside your AsciiDoc source document.</p>
-</div>
-<div class="listingblock">
-<div class="title">Example docinfo.html</div>
-<div class="content">
-<pre class="prettyprint highlight"><code data-lang="html">&lt;style&gt;
-    a:hover, a:active, a:focus {
-        text-decoration:none;
-        color:#009fe3;
-    }
-    .listingblock .switch {
-        border-color: #0061a0;
-    }
-    .switch .switch--item {
-        color: #0061a0;
-    }
-    .switch .switch--item.selected {
-        background-color: #0061a0;
-        color: #ffffff;
-    }
-    .switch .switch--item:not(:first-child) {
-        border-color: #0061a0;
-    }
-&lt;/style&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>For PDF output you use the <a href="https://github.com/asciidoctor/asciidoctor-pdf/blob/master/docs/theming-guide.adoc">theming</a> system.
-These two lines in the Asciidoctor configuration in the <code>build.gradle</code> govern the themes used:</p>
-</div>
-<div class="listingblock">
-<div class="title">Theming configuration</div>
-<div class="content">
-<pre>'pdf-stylesdir' : 'theme',
-'pdf-style' : 'my_theme'</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_including_an_expandable_toc"><a class="anchor" href="#_including_an_expandable_toc"></a>Including an expandable TOC</h3>
-<div class="paragraph">
-<p>The default HTML output displays the table of contents as a simple list in the left-hand navigation frame.
-You can use the <a href="https://tscanlin.github.io/tocbot/">Tocbot</a> JavaScript library to render an expandable TOC.</p>
 </div>
 </div>
 </div>
@@ -1301,8 +633,8 @@ You can use the <a href="https://tscanlin.github.io/tocbot/">Tocbot</a> JavaScri
 </div>
 <div id="footer">
 <div id="footer-text">
- <br>
-Last updated 2020-11-13 14:54:43 UTC
+Version <br>
+Last updated 2020-11-19 11:05:28 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
