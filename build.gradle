@@ -1,7 +1,7 @@
 
 plugins {
-    id 'org.asciidoctor.jvm.convert' version '3.1.0'
-    id 'org.asciidoctor.jvm.pdf' version '3.1.0'
+    id 'org.asciidoctor.jvm.convert' version '3.2.0'
+    id 'org.asciidoctor.jvm.pdf' version '3.2.0'
     id 'ru.vyarus.use-python' version '2.2.0'
 }
 
@@ -23,7 +23,7 @@ asciidoctorj {
 }
 
 dependencies {
-    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
+    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0'
 }
 
 asciidoctor {

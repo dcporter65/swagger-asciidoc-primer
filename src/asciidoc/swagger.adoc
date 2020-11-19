@@ -65,7 +65,7 @@ public class PetController {
 
 Here are some of the most useful Swagger annotations:
 
-[cols=",,",options="header",]
+[cols="1,2,3",options="header",]
 |===
 |Annotation |Description |Attributes
 
