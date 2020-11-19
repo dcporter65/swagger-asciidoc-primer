@@ -1,0 +1,22 @@
+= Block switch example in separate source file
+
+== Code sample
+
+[source,http request,role="primary"]
+.Request
+----
+GET https://api.example.com/api/widgets/6cef9e60-8d30-40d5-bbab-c22e6eca9927/users/f6486748-4f6b-4274-9cd4-769ef0671e24
+Accept: application/json
+----
+[source,json,role="secondary"]
+.Response
+----
+200
+Content-Type: application/json
+Date: Mon, 10 Feb 2020 14:34:50 GMT
+{
+"uid": "f6486748-4f6b-4274-9cd4-769ef0671e24",
+"foo": "bar"
+}
+----
+

@@ -236,6 +236,12 @@ ifdef::backend-pdf,env-github[]
 image::code_tabs.png[]
 endif::[]
 
+==== Block-switch plugin ignored issue
+
+This section highlights an issue where the switch plugin seems to be ignored where the `sources` closure in
+the `build.gradle` file includes more than one source file.
+
+link:switch.html[Block switch example in separate source file^]
 
 === Styling and themes
 

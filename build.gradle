@@ -36,7 +36,7 @@ asciidoctor {
     }
     baseDirFollowsSourceFile()
     sources {
-        include 'index.adoc'
+        include 'switch.adoc', 'index.adoc'
     }
     attributes = [
             'revnumber'         : '',
