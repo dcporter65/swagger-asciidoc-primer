@@ -236,13 +236,6 @@ ifdef::backend-pdf,env-github[]
 image::code_tabs.png[]
 endif::[]
 
-==== Block-switch plugin ignored issue
-
-This section highlights an issue where the switch plugin seems to be ignored where the `sources` closure in
-the `build.gradle` file includes more than one source file.
-
-link:switch.html[Block switch example in separate source file^]
-
 === Styling and themes
 
 You use a https://asciidoctor.org/docs/user-manual/#docinfo-file[docinfo] file to override Asciidoctor's default CSS styling for HTML output.
@@ -281,7 +274,6 @@ These two lines in the Asciidoctor configuration in the `build.gradle` govern th
 'pdf-stylesdir' : 'theme',
 'pdf-style' : 'my_theme'
 ----
-
 
 === Including an expandable TOC
 
