@@ -477,6 +477,120 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     }
 
 </style>
+<style>
+.hidden {
+	display: none;
+}
+
+.switch {
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+	display: inline-block;
+}
+
+.switch--item {
+	padding: 10px;
+	background-color: #ffffff;
+	color: #7a2518;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+	border-width: 0 0 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+}
+
+.switch--item.selected {
+	background-color: #7a2519;
+	color: #ffffff;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+	$('.primary').each(function() {
+		primary = $(this);
+		createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+		primary.children('.title').remove();
+	});
+	$('.secondary').each(function(idx, node) {
+		secondary = $(node);
+		primary = findPrimary(secondary);
+		switchItem = createSwitchItem(secondary, primary.children('.switch'));
+		switchItem.content.addClass('hidden');
+		findPrimary(secondary).append(switchItem.content);
+		secondary.remove();
+	});
+}
+
+function createBlockSwitch(primary) {
+	blockSwitch = $('<div class="switch"></div>');
+	primary.prepend(blockSwitch);
+	return blockSwitch;
+}
+
+function findPrimary(secondary) {
+	candidate = secondary.prev();
+	while (!candidate.is('.primary')) {
+		candidate = candidate.prev();
+	}
+	return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+	blockName = block.children('.title').text();
+	content = block.children('.content').first().append(block.next('.colist'));
+	item = $('<div class="switch--item">' + blockName + '</div>');
+	blockSwitch.append(item);
+	return {'item': item, 'content': content};
+}
+
+function globalSwitch() {
+	$('.switch--item').each(function() {
+		var blockId = blockIdForSwitchItem($(this));
+		$(this).off('click');
+		$(this).on('click', function() {
+			selectedText = $(this).text()
+			window.localStorage.setItem(blockId, selectedText);
+			$(".switch--item").filter(function() {
+				return blockIdForSwitchItem($(this)) === blockId;
+			}).filter(function() {
+				return $(this).text() === selectedText;
+			}).each(function() {
+				select($(this))
+			});
+		});
+		if ($(this).text() === window.localStorage.getItem(blockId)) {
+			select($(this))
+		}
+	});
+}
+
+function blockIdForSwitchItem(item) {
+	idComponents = []
+	idComponents.push(item.text().toLowerCase());
+	item.siblings(".switch--item").each(function(index, sibling) {
+		idComponents.push($(sibling).text().toLowerCase());
+	});
+	return idComponents.sort().join("-")
+}
+
+function select(selected) {
+	selected.addClass('selected');
+	selected.siblings().removeClass('selected');
+	selectedContent = selected.parent().siblings(".content").eq(selected.index())
+	selectedContent.removeClass('hidden');
+	selectedContent.siblings().addClass('hidden');
+}
+
+$(addBlockSwitches);
+$(globalSwitch);
+
+</script>
+
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
@@ -505,11 +619,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_generating_html_and_pdf">Generating HTML and PDF</a>
 <ul class="sectlevel2">
-<li><a href="#_including_side_by_side_code_snippets">Including side-by-side code snippets</a>
-<ul class="sectlevel3">
-<li><a href="#_block_switch_plugin_ignored_issue">Block-switch plugin ignored issue</a></li>
-</ul>
-</li>
+<li><a href="#_including_side_by_side_code_snippets">Including side-by-side code snippets</a></li>
 <li><a href="#_styling_and_themes">Styling and themes</a></li>
 <li><a href="#_including_an_expandable_toc">Including an expandable TOC</a></li>
 </ul>
@@ -1232,16 +1342,6 @@ implementation 'com.acme.widget.client:2.1.1'
 &lt;/dependency&gt;</code></pre>
 </div>
 </div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_block_switch_plugin_ignored_issue"><a class="anchor" href="#_block_switch_plugin_ignored_issue"></a>Block-switch plugin ignored issue</h4>
-<div class="paragraph">
-<p>This section highlights an issue where the switch plugin seems to be ignored where the <code>sources</code> closure in
-the <code>build.gradle</code> file includes more than one source file.</p>
-</div>
-<div class="paragraph">
-<p><a href="switch.html" target="_blank" rel="noopener">Block switch example in separate source file</a></p>
 </div>
 </div>
 </div>
