@@ -1097,8 +1097,8 @@ you declare the dependency in the docs module&#8217;s Gradle build script:</p>
 <div class="title">build.gradle</div>
 <div class="content">
 <pre class="prettyprint highlight"><code data-lang="groovy">plugins {
-    id 'org.asciidoctor.jvm.convert' version '3.1.0'
-    id 'org.asciidoctor.jvm.pdf' version '3.1.0'
+    id 'org.asciidoctor.jvm.convert' version '3.3.0'
+    id 'org.asciidoctor.jvm.pdf' version '3.3.0'
 }
 
 repositories {
@@ -1113,7 +1113,7 @@ configurations {
 }
 
 dependencies {
-    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
+    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0'
 }
 
 ext {
@@ -1163,21 +1163,21 @@ asciidoctor {
 <pre class="prettyprint highlight"><code data-lang="kotlin">import org.asciidoctor.gradle.jvm.AsciidoctorTask
 
 plugins {
-    id("org.asciidoctor.jvm.convert") version "3.2.0"
-    id("org.asciidoctor.jvm.pdf")  version "3.2.0"
+    id("org.asciidoctor.jvm.convert") version "3.3.0"
+    id("org.asciidoctor.jvm.pdf")  version "3.3.0"
 }
 
 repositories {
     maven {
         url = uri("https://repo.spring.io/release")
     }
-    jcenter()
+    mavenCentral()
 }
 
 val asciidoctorExt by configurations.creating
 
 dependencies {
-    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
+    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0")
 }
 
 tasks.withType&lt;AsciidoctorTask&gt; {
@@ -1254,7 +1254,7 @@ side-by-side tabbed view in the generated HTML.</p>
 }
 
 dependencies {
-     asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
+     asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0'
 }</code></pre>
 </div>
 </div>
@@ -1264,7 +1264,7 @@ dependencies {
 <pre class="prettyprint highlight"><code data-lang="kotlin">val asciidoctorExt by configurations.creating
 
 dependencies {
-    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
+    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0")
 }</code></pre>
 </div>
 </div>
@@ -1402,7 +1402,7 @@ You can use the <a href="https://tscanlin.github.io/tocbot/">Tocbot</a> JavaScri
 <div id="footer">
 <div id="footer-text">
  <br>
-Last updated 2020-11-13 14:54:43 UTC
+Last updated 2021-02-08 15:25:06 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
