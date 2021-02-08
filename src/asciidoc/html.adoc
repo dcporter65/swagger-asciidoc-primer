@@ -12,8 +12,8 @@ you declare the dependency in the docs module's Gradle build script:
 .build.gradle
 ----
 plugins {
-    id 'org.asciidoctor.jvm.convert' version '3.1.0'
-    id 'org.asciidoctor.jvm.pdf' version '3.1.0'
+    id 'org.asciidoctor.jvm.convert' version '3.3.0'
+    id 'org.asciidoctor.jvm.pdf' version '3.3.0'
 }
 
 repositories {
@@ -28,7 +28,7 @@ configurations {
 }
 
 dependencies {
-    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
+    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0'
 }
 
 ext {
@@ -77,21 +77,21 @@ asciidoctor {
 import org.asciidoctor.gradle.jvm.AsciidoctorTask
 
 plugins {
-    id("org.asciidoctor.jvm.convert") version "3.2.0"
-    id("org.asciidoctor.jvm.pdf")  version "3.2.0"
+    id("org.asciidoctor.jvm.convert") version "3.3.0"
+    id("org.asciidoctor.jvm.pdf")  version "3.3.0"
 }
 
 repositories {
     maven {
         url = uri("https://repo.spring.io/release")
     }
-    jcenter()
+    mavenCentral()
 }
 
 val asciidoctorExt by configurations.creating
 
 dependencies {
-    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
+    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0")
 }
 
 tasks.withType<AsciidoctorTask> {
@@ -153,7 +153,7 @@ configurations {
 }
 
 dependencies {
-     asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE'
+     asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0'
 }
 ----
 [source,kotlin,role="secondary"]
@@ -162,7 +162,7 @@ dependencies {
 val asciidoctorExt by configurations.creating
 
 dependencies {
-    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.4.3.RELEASE")
+    asciidoctorExt("io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0")
 }
 ----
 ====
