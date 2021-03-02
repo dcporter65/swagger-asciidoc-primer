@@ -1,0 +1,45 @@
+extends: base
+
+font:
+  catalog:
+    Source Sans Pro:
+      normal: source-sans-pro.regular.ttf
+      italic: source-sans-pro.italic.ttf
+      bold: source-sans-pro.bold.ttf
+      bold_italic: source-sans-pro.bold-italic.ttf
+
+title_page:
+  align: right
+
+page:
+  layout: portrait
+  size: A4
+  margin: [2.5cm, 2.5cm, 2.5cm, 2.5cm ]
+
+base:
+  font_size: 9.5
+  font_size_large: $base_font_size * 1.25
+  font_size_small: $base_font_size * 0.85
+  font_family: Source Sans Pro
+
+revision:
+    font_size: $base_font_size_small
+    font_color: #009FE3
+    margin_top: 14
+
+preamble:
+  font_size: $base_font_size_small
+
+heading:
+  font-color: #202E39
+
+link:
+  font_color: #009FE3
+
+footer:
+  height: 1cm
+  line_height: 1.2
+
+code:
+  font_size: 9
+

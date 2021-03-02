@@ -1,11 +1,16 @@
 = Documenting APIs with Swagger and AsciiDoc
 :version-label!:
 :imagesdir: ./images
+:linkattrs:
 
 This guide explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
 documentation for your RESTful APIs. The document source is available at:
 
 https://github.com/dcp65/swagger-asciidoc-primer
+
+ifndef::backend-pdf[]
+And you can view the PDF output link:../index.pdf[here^].
+endif::[]
 
 == Process overview
 
