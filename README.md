@@ -15,4 +15,4 @@ The document is published to GitHub Pages using the ghp-import tool.
 
 The published document is here:
 
-https://dcp65.github.io/swagger-asciidoc-primer/
+https://dcporter65.github.io/swagger-asciidoc-primer/
