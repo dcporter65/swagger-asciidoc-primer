@@ -6,7 +6,7 @@
 This guide explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
 documentation for your RESTful APIs. The document source is available at:
 
-https://github.com/dcp65/swagger-asciidoc-primer
+https://github.com/dcporter65/swagger-asciidoc-primer
 
 ifndef::backend-pdf[]
 And you can view the PDF output https://dcp65.github.io/swagger-asciidoc-primer/index.pdf[here^].
