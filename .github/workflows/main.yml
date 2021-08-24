@@ -15,21 +15,21 @@ jobs:
       - name: Build HTML
         uses: avattathil/asciidoctor-action@master
         with:
-          program: "asciidoctor -D . --backend=html5 index.adoc"
+          program: "asciidoctor -D . --backend=html5 ./src/asciidoctor/index.adoc -o ./build/index.html"
 
       - name: Upload HTML Artifact
         uses: actions/upload-artifact@v1
         with:
           name: HTML document
-          path: index.html
+          path: ./build/index.html
 
       - name: Build PDF
         uses: avattathil/asciidoctor-action@master
         with:
-          program: "asciidoctor-pdf -a allow-uri-read -D . index.adoc"
+          program: "asciidoctor-pdf -a allow-uri-read -D . ./src/asciidoctor/index.adoc -o/build/index.pdf"
 
       - name: Upload PDF Artifact
         uses: actions/upload-artifact@v2
         with:
           name: PDF document
-          path: index.pdf
+          path: ./build/index.pdf
