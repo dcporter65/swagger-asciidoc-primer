@@ -9,7 +9,7 @@ documentation for your RESTful APIs. The document source is available at:
 https://github.com/dcporter65/swagger-asciidoc-primer
 
 ifndef::backend-pdf[]
-And you can view the PDF output https://dcp65.github.io/swagger-asciidoc-primer/index.pdf[here^].
+And you can view the PDF output link:./index.pdf[here^].
 endif::[]
 
 == Process overview
@@ -19,7 +19,7 @@ ifndef::env-github[]
 [plantuml, ./diagram, png]
 ....
 @startuml
-
+    
 skinparam sequence {
   ActorBorderColor #0061a0
   ArrowColor #0061a0
