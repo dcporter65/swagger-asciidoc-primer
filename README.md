@@ -11,8 +11,4 @@ To view the generated documentation, clone this repository and run the following
 
 Generated HTML and PDF is available in the project `build` directory.
 
-The document is published to GitHub Pages using the ghp-import tool.
-
-The published document is here:
-
-https://dcporter65.github.io/swagger-asciidoc-primer/
+The document is published to GitHub Pages when you push to the 'master' branch using GitHub Actions.
