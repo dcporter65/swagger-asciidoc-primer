@@ -18,5 +18,8 @@ jobs:
         run: chmod +x gradlew
       - name: Build doc
         run: ./gradlew asciidoctor
-      - name: Publish doc
-        run: ./gradlew publishDoc
+      - name: Deploy doc
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: build # The folder the action should deploy.
