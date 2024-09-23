@@ -1,7 +1,7 @@
 plugins {
-    id 'org.asciidoctor.jvm.convert' version '3.3.0'
-    id 'org.asciidoctor.jvm.pdf' version '3.3.0'
-    id 'ru.vyarus.use-python' version '2.2.0'
+    id 'org.asciidoctor.jvm.convert' version '4.0.3'
+    id 'org.asciidoctor.jvm.pdf' version '4.0.3'
+    id 'ru.vyarus.use-python' version '4.0.0'
 }
 
 repositories {
@@ -16,14 +16,14 @@ configurations {
 }
 
 asciidoctorj {
-    version = '2.4.1'
+    version = '2.5.7'
     modules {
         diagram.use()
     }
 }
 
 dependencies {
-    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.5.0'
+    asciidoctorExt 'io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch:0.6.3'
 }
 
 asciidoctor {
@@ -50,14 +50,4 @@ asciidoctor {
             'toc'               : 'left',
             'toclevels'         : '3'
     ]
-}
-
-
-python.pip 'ghp-import:1.0.0'
-
-task publishDoc(type: PythonTask) {
-    group = "documentation"
-    description = "Publish the generated output to GitHub Pages"
-    module = 'ghp_import'
-    command "-p $buildDir"
 }
