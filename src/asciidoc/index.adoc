@@ -4,7 +4,7 @@
 :linkattrs:
 
 This guide explains how to use the Swagger specification and the AsciiDoc markup language to generate reference
-documentation for your RESTful APIs. The document source is available at:
+documentation for a REST API written in Java or Groovy. The document source is available at:
 
 https://github.com/dcporter65/swagger-asciidoc-primer
 
