@@ -30,6 +30,6 @@ To view the generated documentation:
     </details>
 
 The `gradlew` wrapper script automatically downloads and installs the Gradle build tool and executes the commands in the `build.gradle` file.
-Generated HTML and PDF is written to the project `build` directory.
+Generated HTML and PDF are written to the project `build` directory.
 
 The document is published to GitHub Pages when you push to the 'master' branch using GitHub Actions.
